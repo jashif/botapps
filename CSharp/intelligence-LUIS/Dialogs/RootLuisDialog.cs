@@ -23,7 +23,8 @@ namespace LuisBot.Dialogs
         public async Task GetExpense(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
             var message = await activity;
-            if (context.UserData.TryGetValue(ContextConstants.EmailKey, out string userName))
+            string userName;
+            if (context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
             {
 
             }
@@ -42,7 +43,8 @@ namespace LuisBot.Dialogs
         public async Task AddExpense(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
             var message = await activity;
-            if (context.UserData.TryGetValue(ContextConstants.EmailKey, out string userName))
+            string userName;
+            if (context.UserData.TryGetValue(ContextConstants.EmailKey, out userName))
             {
 
             }
@@ -64,8 +66,8 @@ namespace LuisBot.Dialogs
         {
             await context.PostAsync($"Welcome to the expense buddy support!");
 
-
-            if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out string userName))
+            string userName;
+            if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
             {
                 PromptDialog.Text(context, this.ResumeAfterPrompt, "Before get started, please tell me your registered emailid?");
                 return;
@@ -240,7 +242,9 @@ namespace LuisBot.Dialogs
                 if (!string.IsNullOrEmpty(state.EmailId))
 
                 {
-                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out string userName))
+                    string userName;
+                   
+                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
                     {
                         context.UserData.SetValue(ContextConstants.EmailKey, state.EmailId);
 
@@ -273,7 +277,9 @@ namespace LuisBot.Dialogs
                 if (!string.IsNullOrEmpty(state.EmailId))
 
                 {
-                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out string userName))
+                    string userName;
+                    
+                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
                     {
                         context.UserData.SetValue(ContextConstants.EmailKey, state.EmailId);
 
