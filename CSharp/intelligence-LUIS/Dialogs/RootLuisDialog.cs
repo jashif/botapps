@@ -324,7 +324,7 @@ namespace LuisBot.Dialogs
 
         public string EmailId { get; set; }
 
-        [Prompt("Please enter your {&}")]
+        [Prompt("Please enter the {&}")]
         public string ExpenseItemName { get; set; }
 
         [Prompt("Please enter the {&}")]
