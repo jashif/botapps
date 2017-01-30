@@ -24,7 +24,7 @@ namespace LuisBot.Dialogs
         {
             var message = await activity;
             string userName;
-            if (context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
+            if (context.UserData.TryGetValue(ContextConstants.EmailKey, out userName))
             {
 
             }
@@ -55,7 +55,7 @@ namespace LuisBot.Dialogs
                 addexpensequery.EmailId = userName;
             }
             // await context.PostAsync($"Welcome to the expense buddy support! we are analyzing your message: '{message.Text}'...");
-           
+
             var addexpenseFormDialog = new FormDialog<AddExpenseQuery>(addexpensequery, this.AddExpenseForm, FormOptions.PromptInStart, result.Entities);
             context.Call(addexpenseFormDialog, this.ResumeAfterAddexpenseFormDialog);
         }
@@ -67,7 +67,7 @@ namespace LuisBot.Dialogs
             await context.PostAsync($"Welcome to the expense buddy support!");
 
             string userName;
-            if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
+            if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out userName))
             {
                 PromptDialog.Text(context, this.ResumeAfterPrompt, "Before get started, please tell me your registered emailid?");
                 return;
@@ -104,7 +104,7 @@ namespace LuisBot.Dialogs
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hi! please type like 'find my expense','get my expense' etc");
+            await context.PostAsync("Hi! please find the options \n 1) 'type 'expense' or 'find my expense', 'get my expense' \n 2) Add expense or Add Expense for me , Please add expense");
             context.Wait(this.MessageReceived);
         }
         private async Task ResumeAfterExpenseFormDialog(IDialogContext context, IAwaitable<ExpenseQuery> result)
@@ -243,8 +243,8 @@ namespace LuisBot.Dialogs
 
                 {
                     string userName;
-                   
-                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
+
+                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out userName))
                     {
                         context.UserData.SetValue(ContextConstants.EmailKey, state.EmailId);
 
@@ -278,8 +278,8 @@ namespace LuisBot.Dialogs
 
                 {
                     string userName;
-                    
-                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out  userName))
+
+                    if (!context.UserData.TryGetValue(ContextConstants.EmailKey, out userName))
                     {
                         context.UserData.SetValue(ContextConstants.EmailKey, state.EmailId);
 
@@ -334,7 +334,7 @@ namespace LuisBot.Dialogs
         public string ExpenseItemName { get; set; }
 
         [Prompt("Please enter the {&}")]
-  
+
         public double Amount { get; set; }
 
         [Prompt("Please enter the {&}")]
