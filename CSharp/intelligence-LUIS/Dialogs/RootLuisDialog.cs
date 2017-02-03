@@ -316,7 +316,7 @@ namespace LuisBot.Dialogs
             };
             return new FormBuilder<AddExpenseQuery>()
 
-                .Field(nameof(AddExpenseQuery.EmailId), (state) => string.IsNullOrEmpty(state.EmailId),)
+                .Field(nameof(AddExpenseQuery.EmailId), (state) => string.IsNullOrEmpty(state.EmailId))
                 .Field(nameof(AddExpenseQuery.ExpenseItemName), (state) => string.IsNullOrEmpty(state.ExpenseItemName))
                 .Field(nameof(AddExpenseQuery.Amount))
                 .Field(nameof(AddExpenseQuery.Description), (state) => string.IsNullOrEmpty(state.Description))
