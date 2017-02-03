@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 
 namespace LuisBot.Model
@@ -29,17 +30,20 @@ namespace LuisBot.Model
         [Prompt("Please enter your {&}")]
         [Pattern(RegexConstants.Email)]
 
+        [DataMember(Name = "emailid")]
         public string EmailId { get; set; }
 
         [Prompt("Please enter the {&}")]
+        [DataMember(Name = "name")]
         public string ExpenseItemName { get; set; }
 
         [Prompt("Please enter the {&}")]
+        [DataMember(Name = "amount")]
 
         public double Amount { get; set; }
 
         [Prompt("Please enter the {&}")]
-
+        [DataMember(Name = "description")]
 
         public string Description { get; set; }
 

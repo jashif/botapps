@@ -159,6 +159,11 @@ namespace LuisBot.Dialogs
             try
             {
                 var searchQuery = await result;
+                string userName;
+                if (context.UserData.TryGetValue(ContextConstants.EmailKey, out userName))
+                {
+                    searchQuery.EmailId = userName;
+                }
                 var response = await this.AddExpenseByEmailId(searchQuery);
                 var resultMessage = context.MakeMessage();
                 if (response.status == "success")
@@ -201,7 +206,7 @@ namespace LuisBot.Dialogs
 
         public async Task<ExpenseData> GetExpenseByEmailId(string userid)
         {
-            var responseElement = await MakeRequest<ExpenseData, object>("http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid, null, Method.POST);//
+            var responseElement = await MakeRequest<ExpenseData>("http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid, null, Method.GET);//
 
 
             return responseElement;
@@ -209,8 +214,12 @@ namespace LuisBot.Dialogs
 
         public async Task<BaseData> AddExpenseByEmailId(AddExpenseQuery data)
         {
-
-            var responseElement = await MakeRequest<BaseData, AddExpenseQuery>("http://expensebuddy.azurewebsites.net/api/botdata/addexpense", data, Method.POST);//
+            var dict = new Dictionary<string, object>();
+            dict.Add("emailid", data.EmailId);
+            dict.Add("name", data.ExpenseItemName);
+            dict.Add("amount", data.Amount);
+            dict.Add("description", data.Description);
+            var responseElement = await MakeRequest<BaseData>("http://localhost:26264/api/botdata/addexpense", dict, Method.POST);//
 
 
             return responseElement;
@@ -221,7 +230,7 @@ namespace LuisBot.Dialogs
             GET,
             POST
         }
-        private async Task<T> MakeRequest<T, T1>(string url, T1 postdata = null, Method method = Method.GET) where T : class where T1 : class
+        private async Task<T> MakeRequest<T>(string url, object postdata = null, Method method = Method.GET) where T : class 
         {
             HttpClient client = new HttpClient();
             // client.BaseAddress = new Uri("http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid);
@@ -233,7 +242,9 @@ namespace LuisBot.Dialogs
             }
             else
             {
-                response = client.PostAsJsonAsync<T1>(url, postdata).Result;
+                var jsn = JsonConvert.SerializeObject(postdata);
+                var htpc = new StringContent(jsn, System.Text.Encoding.UTF8, "application/json");
+                response = client.PostAsync(url, htpc).Result;
                 //"http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid
                 //"http://expensebuddy.azurewebsites.net/api/botdata/addexpense"
             }
