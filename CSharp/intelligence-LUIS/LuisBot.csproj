@@ -128,6 +128,7 @@
     </Compile>
     <Compile Include="Hotel.cs" />
     <Compile Include="HotelsQuery.cs" />
+    <Compile Include="Model\ExpenseData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BingSpellCheckError.cs" />
     <Compile Include="Services\BingSpellCheckFlaggedToken.cs" />

@@ -12,6 +12,8 @@ using Microsoft.Bot.Connector;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using LuisBot.Model;
+
 namespace LuisBot.Dialogs
 {
 
@@ -86,6 +88,7 @@ namespace LuisBot.Dialogs
             try
             {
                 var userName = await result;
+
                 // this.userWelcomed = true;
 
                 await context.PostAsync($"Welcome {userName}!, Type 'help' if you need assistance.");
@@ -156,12 +159,13 @@ namespace LuisBot.Dialogs
             try
             {
                 var searchQuery = await result;
-                var response = await this.GetExpenseByEmailId(searchQuery.EmailId);
+                var response = await this.AddExpenseByEmailId(searchQuery);
                 var resultMessage = context.MakeMessage();
-                if (response.status)
+                if (response.status == "success")
                 {
-                    await context.PostAsync("I found your expense");
-                    resultMessage.Text = "your expense for current month  is Rs: " + response.amount;
+                    // await context.PostAsync("I have added the expense for you");
+                    resultMessage.Text = "I have added the expense for you";
+
                     await context.PostAsync(resultMessage);
                 }
                 else
@@ -197,39 +201,50 @@ namespace LuisBot.Dialogs
 
         public async Task<ExpenseData> GetExpenseByEmailId(string userid)
         {
+            var responseElement = await MakeRequest<ExpenseData, object>("http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid, null, Method.POST);//
 
+
+            return responseElement;
+        }
+
+        public async Task<BaseData> AddExpenseByEmailId(AddExpenseQuery data)
+        {
+
+            var responseElement = await MakeRequest<BaseData, AddExpenseQuery>("http://expensebuddy.azurewebsites.net/api/botdata/addexpense", data, Method.POST);//
+
+
+            return responseElement;
+        }
+
+        public enum Method
+        {
+            GET,
+            POST
+        }
+        private async Task<T> MakeRequest<T, T1>(string url, T1 postdata = null, Method method = Method.GET) where T : class where T1 : class
+        {
             HttpClient client = new HttpClient();
             // client.BaseAddress = new Uri("http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid);
-
-            client.DefaultRequestHeaders.Accept.Add(
-
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // string parameter = string.Format(Consts.LookupBikesWithUserAPI, userid);
-
-            HttpResponseMessage response = client.GetAsync("http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid).Result;
-
-            if (response.IsSuccessStatusCode)
-
+            HttpResponseMessage response = null;
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            if (method == Method.GET)
             {
-
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-
-                String responseString = await response.Content.ReadAsStringAsync();
-
-                var responseElement = JsonConvert.DeserializeObject<ExpenseData>(responseString, settings);
-
-                return responseElement;
-
+                response = client.GetAsync(url).Result;
             }
             else
             {
-
-                return null;
-
+                response = client.PostAsJsonAsync<T1>(url, postdata).Result;
+                //"http://expensebuddy.azurewebsites.net/api/botdata/myexpense?emailId=" + userid
+                //"http://expensebuddy.azurewebsites.net/api/botdata/addexpense"
             }
-        }
+            JsonSerializerSettings settings = new JsonSerializerSettings();
 
+            String responseString = await response.Content.ReadAsStringAsync();
+
+            var responseElement = JsonConvert.DeserializeObject<T>(responseString, settings);
+
+            return responseElement;
+        }
         private IForm<ExpenseQuery> BuildExpenseForm()
         {
 
@@ -301,7 +316,7 @@ namespace LuisBot.Dialogs
             };
             return new FormBuilder<AddExpenseQuery>()
 
-                .Field(nameof(AddExpenseQuery.EmailId), (state) => string.IsNullOrEmpty(state.EmailId))
+                .Field(nameof(AddExpenseQuery.EmailId), (state) => string.IsNullOrEmpty(state.EmailId),)
                 .Field(nameof(AddExpenseQuery.ExpenseItemName), (state) => string.IsNullOrEmpty(state.ExpenseItemName))
                 .Field(nameof(AddExpenseQuery.Amount))
                 .Field(nameof(AddExpenseQuery.Description), (state) => string.IsNullOrEmpty(state.Description))
@@ -311,50 +326,4 @@ namespace LuisBot.Dialogs
         }
     }
 
-    [Serializable]
-    public class ExpenseQuery
-    {
-
-        [Prompt("Please enter your {&}")]
-
-        [Optional]
-        public string EmailId { get; set; }
-
-    }
-    [Serializable]
-    public class AddExpenseQuery
-    {
-
-        [Prompt("Please enter your {&}")]
-
-
-        public string EmailId { get; set; }
-
-        [Prompt("Please enter the {&}")]
-        public string ExpenseItemName { get; set; }
-
-        [Prompt("Please enter the {&}")]
-
-        public double Amount { get; set; }
-
-        [Prompt("Please enter the {&}")]
-
-
-        public string Description { get; set; }
-
-
-
-    }
-
-    [Serializable]
-    public class ExpenseData
-    {
-
-        public double amount { get; set; }
-
-        public bool status { get; set; }
-
-        //{"amount":2908.0,"status":true}
-
-    }
 }
