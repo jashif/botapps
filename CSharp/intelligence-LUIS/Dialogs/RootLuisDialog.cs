@@ -219,7 +219,7 @@ namespace LuisBot.Dialogs
             dict.Add("name", data.ExpenseItemName);
             dict.Add("amount", data.Amount);
             dict.Add("description", data.Description);
-            var responseElement = await MakeRequest<BaseData>("http://localhost:26264/api/botdata/addexpense", dict, Method.POST);//
+            var responseElement = await MakeRequest<BaseData>("http://expensebuddy.azurewebsites.net/api/botdata/addexpense", dict, Method.POST);//
 
 
             return responseElement;
